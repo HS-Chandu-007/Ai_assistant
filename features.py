@@ -1,4 +1,4 @@
-import datetime, subprocess, webbrowser, wikipedia, re, json, os
+import datetime, subprocess, webbrowser, wikipedia, re, json, os, requests
 from youtubesearchpython import VideosSearch
 from pathlib import Path
 
@@ -95,14 +95,15 @@ def restart_system():
     subprocess.run("shutdown /r /t 1", shell=True)
     return "Restarting."
 
+# 🧠 Fallback using local Ollama LLaMA2
 def gpt_fallback(prompt):
     try:
-        from gpt4all import GPT4All
-        model_path = Path("/mnt/data/gpt4all/gpt4all-model.bin")
-        if not model_path.exists():
-            return "Local GPT model not found."
-        model = GPT4All(model_path.as_posix())
-        return model.generate(prompt, max_tokens=100)
+        response = requests.post(
+            "http://localhost:11434/api/generate",
+            json={"model": "llama2", "prompt": prompt, "stream": False}
+        )
+        result = response.json()
+        return result.get("response", "Sorry, I couldn't generate a response.")
     except Exception as e:
-        return f"GPT error: {str(e)}"
+        return f"Ollama error: {str(e)}"
 
