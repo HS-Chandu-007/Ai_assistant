@@ -2,14 +2,15 @@ import pyttsx3
 import re
 
 def speak(text):
-    print(f"🧠 Assistant: {text}")
-    cleaned_text = re.sub(r'[^\w\s.,!?]', '', text)
+    clean = re.sub(r'[^\w\s.,!?]', '', text)
+    print("🧠 Jarvis:", clean)
 
-    # Create engine *inside* the function
-    engine = pyttsx3.init('sapi5')  # sapi5 is for Windows
-    voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[0].id)
-    engine.setProperty('rate', 180)
-
-    engine.say(cleaned_text)
-    engine.runAndWait()
+    try:
+        engine = pyttsx3.init(driverName='sapi5')  # Use Windows speech driver
+        voices = engine.getProperty('voices')
+        engine.setProperty('voice', voices[0].id)  # Use default voice
+        engine.setProperty('rate', 180)  # Adjust speed
+        engine.say(clean)
+        engine.runAndWait()
+    except Exception as e:
+        print("❌ Error in speak():", str(e)
