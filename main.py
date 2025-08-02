@@ -1,49 +1,49 @@
-import listener
-import talker
-import helper
+from listener import listen
+from speak import speak
+import features as fx
 
-talker.speak("Hello Master! I am ready to assist you.")
+speak("Jarvis online.")
 
 while True:
-    print("🎙️ Listening...")
-    query = listener.listen()
+    query = listen()
+    if not query:
+        continue
 
-    if query:
-        query = query.lower()
-        print(f"🗣️ You said: {query}")
-
-        if "time" in query:
-            response = helper.get_current_time()
-            talker.speak(response)
-
-        elif "weather" in query:
-            response = helper.get_weather()
-            talker.speak(response)
-
-        elif "exit" in query or "quit" in query:
-            talker.speak("Goodbye Hermit. Shutting down.")
-            break
-
-        elif "open" in query:
-            response = helper.open_website(query)
-            talker.speak(response)
-
-        elif "launch" in query or "start" in query:
-            response = helper.open_application(query)
-            talker.speak(response)
-
-        elif "youtube" in query and any(word in query for word in ["play", "video", "tutorial", "music"]):
-            ignore_words = ["play", "video", "videos", "on", "youtube", "tutorial", "some", "music"]
-            search_terms = [word for word in query.split() if word not in ignore_words]
-            cleaned_query = " ".join(search_terms).strip()
-
-            response = helper.play_youtube_video(cleaned_query)
-            talker.speak(response)
-
-        else:
-            talker.speak("Sorry, I didn’t catch that.")
+    if "time" in query:
+        speak(fx.get_current_time())
+    elif "wikipedia" in query:
+        speak(fx.wikipedia_summary(query))
+    elif "search" in query:
+        speak(fx.search_google(query))
+    elif "play" in query and "youtube" in query:
+        speak(fx.play_youtube_video(query))
+    elif "open" in query and ("file" in query or "delete" in query):
+        speak(fx.file_operation(query))
+    elif "open" in query or "website" in query:
+        speak(fx.open_website(query))
+    elif any(app in query for app in ["chrome", "notepad", "vscode", "calculator"]):
+        speak(fx.open_application(query))
+    elif query.startswith("add to do"):
+        task = query.replace("add to do", "").strip()
+        speak(fx.todo_add(task))
+    elif "show to do" in query:
+        speak(fx.todo_list())
+    elif "delete to do" in query:
+        item = query.replace("delete to do", "").strip()
+        speak(fx.todo_delete(item))
+    elif "shut down" in query:
+        speak(fx.shutdown_system())
+        break
+    elif "restart" in query:
+        speak(fx.restart_system())
+        break
+    elif "exit" in query or "goodbye" in query:
+        speak("Goodbye.")
+        break
     else:
-        talker.speak("Sorry, I didn’t catch that.")
+        speak(fx.gpt_fallback(query))
+
+
 
 
 
